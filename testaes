@@ -6,18 +6,22 @@ from Crypto.Util.Padding import pad,unpad
 from base64 import b64encode as b64
 import sys
 
+def padding(inputtext):
+    tobyte = bytearray(inputtext,"UTF-8")
+    return pad(tobyte,AES.block_size)
+def utf(unutftext):
+    return b64(unutftext).decode("UTF-8")
 def encrypt(padtext, key):
     cipher = AES.new(key, AES.MODE_CBC)
     b = padtext
     return cipher.iv, cipher.encrypt(b)
 def decrypt(iv, enc_text):
     cipher = AES.new(key, AES.MODE_CBC, iv=iv)
-    return unpad(cipher.decrypt(enc_text),AES.block_size)
-def padding(inputtext):
-    tobyte = bytearray(inputtext,"UTF-8")
-    return pad(tobyte,AES.block_size)
-def utf(unutftext):
-    return b64(unutftext).decode("UTF-8")
+    try:
+    	return unpad(cipher.decrypt(enc_text),AES.block_size)
+    except:
+    	return unpad(cipher.decrypt(tobyte(enc_text)),AES.block_size)
+
     
 if __name__ == "__main__":
     plain_text = sys.argv[1]
