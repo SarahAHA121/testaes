@@ -1,0 +1,33 @@
+#!/bin/python
+
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes as rand
+from Crypto.Util.Padding import pad,unpad
+from base64 import b64encode as b64
+import sys
+
+def encrypt(padtext, key):
+    cipher = AES.new(key, AES.MODE_CBC)
+    b = padtext
+    return cipher.iv, cipher.encrypt(b)
+def decrypt(iv, enc_text):
+    cipher = AES.new(key, AES.MODE_CBC, iv=iv)
+    return unpad(cipher.decrypt(enc_text),AES.block_size)
+def padding(inputtext):
+    tobyte = bytearray(inputtext,"UTF-8")
+    return pad(tobyte,AES.block_size)
+def utf(unutftext):
+    return b64(unutftext).decode("UTF-8")
+    
+if __name__ == "__main__":
+    plain_text = sys.argv[1]
+    padtext = padding(plain_text)
+    key = rand(16)
+    iv, enc_text = encrypt(padtext, key)
+    print('Key: ',utf(key))
+    print('iv: ',utf(iv))
+    print('Text: ',plain_text)
+    print('Encrypted: ',utf(enc_text))
+    dec_text = decrypt(iv, enc_text)
+    print('Decrypted: ',utf(dec_text))
+
